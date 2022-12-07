@@ -7,44 +7,45 @@ from bs4 import BeautifulSoup
 
 class Beatles1Spider(scrapy.Spider):
     name = 'Beatles1'
-    allowed_domains = ['j-lyric.net']
-    start_urls = ['https://j-lyric.net/artist/a04d22c/']
+    allowed_domains = ['lyrics.az']
+    start_urls = ['https://lyrics.az/the-beatles/allsongs.html']
 
     def parse(self, response):
 
-        for song in response.css('#ly1'):
+        for song in response.css('tbody').css('tr'):
             item = SongCrawlItem()
             song_title = song.css('a::text').extract_first()
             item['title'] = song_title
-            pattern = r'/artist/'
             song_path = song.css('a::attr(href)').extract_first()
-            print(song_path)
-            if re.search(pattern, song_path):
-                print('aaaaaaaaaaaaaaaaaaaaa')
-                song_url = 'http://' + self.allowed_domains[0] + song_path
-                # 1秒間停止する
-                time.sleep(1)
-
-                yield scrapy.Request(
-                    song_url,
-                    callback=self.parse_lyrics,
-                    meta={'item': item}
-                )
+            print(song_title)
+            song_url = song_path
+            print(song_url)
+            print('aaaaaa')
+            # 1秒間停止する
+            time.sleep(1)
+            yield scrapy.Request(
+                song_url,
+                callback=self.parse_lyrics,
+                meta={'item': item}
+            )
 
     def parse_lyrics(self, response):
        # 歌詞自体を抽出する
+       print('bbbbbbbbb')
        item = response.meta['item']
        item['url'] = response.url
 
        # text
-       text = response.css('#Lyric').extract_first()
+       text = response.css('.song-lyrics').extract_first()
        soup = BeautifulSoup(text, 'html')
+       print(text)
        song_lyrics = soup.getText()
 
        # テキストのクリーニング
        song_lyrics = song_lyrics
 
        # 歌詞
+       print(song_lyrics)
        item['lyric'] = song_lyrics
        yield item
 
