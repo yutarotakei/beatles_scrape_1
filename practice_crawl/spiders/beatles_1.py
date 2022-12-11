@@ -20,7 +20,6 @@ class Beatles1Spider(scrapy.Spider):
             print(song_title)
             song_url = song_path
             print(song_url)
-            print('aaaaaa')
             # 1秒間停止する
             time.sleep(1)
             yield scrapy.Request(
@@ -31,7 +30,6 @@ class Beatles1Spider(scrapy.Spider):
 
     def parse_lyrics(self, response):
        # 歌詞自体を抽出する
-       print('bbbbbbbbb')
        item = response.meta['item']
        item['url'] = response.url
 
